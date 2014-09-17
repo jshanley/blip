@@ -1,5 +1,10 @@
 import "context";
 
+/*
+* Precise scheduling for audio events
+* Based on the method described in this article by Chris Wilson:
+*   http://www.html5rocks.com/en/tutorials/audio/scheduling/
+*/
 blip.scheduler = function() {
 
   var lookahead = 25.0, // ms
