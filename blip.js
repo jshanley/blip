@@ -2,46 +2,110 @@
 
 var blip = {};
 var ctx = new AudioContext();
+blip.node = function() {
+
+  var reference,
+      id;
+
+  var inputs = [],
+      outputs = [];
+
+  function node() {}
+
+  function rewireInputs(a) {
+    inputs.forEach(function(d) { d.node().disconnect(); })
+    a.forEach(function(d) { d.node().connect(reference); })
+    inputs = a;
+  }
+  function rewireOutputs(a) {
+    reference.disconnect();
+    a.forEach(function(d) { reference.connect(d.node())})
+    outputs = a;
+  }
+
+  node.wrap = function(audionode) {
+    reference = audionode;
+    return node;
+  };
+  node.create = function(f) {
+    reference = f.call(node, ctx);
+    return node;
+  }
+  node.connect = function(blipnode) {
+    outputs.push(blipnode);
+    reference.connect(blipnode.node())
+    return node;
+  };
+  node.inputs = function(a) {
+    if (!arguments.length) return inputs;
+    rewireInputs(a);
+    return node;
+  };
+  node.outputs = function(a) {
+    if (!arguments.length) return outputs;
+    outputs = a;
+    rewire();
+    return node;
+  };
+  node.param = function(name, value) {
+    if (!arguments.length) return node;
+    if (arguments.length === 2) {
+      reference[name].value = value;
+    } else {
+      return reference[name].value;
+    }
+    return node;
+  };
+  node.node = function() {
+    return reference;
+  }
+
+  return node;
+
+}
 
 
 /*
-* Precise scheduling for audio events
-* Based on the method described in this article by Chris Wilson:
-*   http://www.html5rocks.com/en/tutorials/audio/scheduling/
+ Precise scheduling for audio events is
+ based on the method described in this article by Chris Wilson:
+   http://www.html5rocks.com/en/tutorials/audio/scheduling/
 */
-blip.scheduler = function() {
+
+blip.loop = function() {
 
   var lookahead = 25.0, // ms
-      scheduleAheadTime = 0.1, // s
-      tickQueue = [];
+      scheduleAheadTime = 0.1; // s
 
-  var tempo, // ticks per minute
-      ticks; // number of ticks per cycle
+  var tempo; // ticks per minute
+
+  var data = [];
 
   var currentTick = 0,
       nextTickTime = 0;
 
-  var action = function(tickNum, time) {};
+  var tick = function(t, d, i) {};
 
-  var timer = 0;
+  var iterations = 0,
+      limit = 0;
 
-  function my() {}
+  var timer;
+
+  function loop() {}
 
   function nextTick() {
     var secondsPerTick = 60 / tempo;
     nextTickTime += secondsPerTick;
 
     // cycle through ticks
-    if (currentTick < ticks) {
-      currentTick += 1;
-    } else {
+    if (++currentTick >= data.length) {
       currentTick = 0;
+      iterations += 1;
     }
+
   }
 
   function scheduleTick(tickNum, time) {
-    //tickQueue.push({ tick: tickNum, time: when });
-    action.call(my, tickNum, time);
+    tick.call(loop, time, data[tickNum], tickNum);
   }
 
   function scheduler() {
@@ -50,45 +114,57 @@ blip.scheduler = function() {
       nextTick();
     }
     timer = window.setTimeout(scheduler, lookahead);
+    if (limit && iterations >= limit) {
+      loop.stop().reset();
+    }
   }
 
-  my.tempo = function(bpm) {
+  loop.tempo = function(bpm) {
     if (!arguments.length) return tempo;
     tempo = bpm;
-    return my;
+    return loop;
   };
-  my.ticks = function(n) {
-    if (!arguments.length) return ticks;
-    ticks = n;
-    return my;
+  loop.data = function(a) {
+    if (!arguments.length) return data;
+    data = a;
+    return loop;
   };
-  my.lookahead = function(ms) {
+  loop.lookahead = function(ms) {
     if (!arguments.length) return lookahead;
     lookahead = ms;
-    return my;
+    return loop;
   };
-  my.scheduleAheadTime = function(s) {
+  loop.scheduleAheadTime = function(s) {
     if (!arguments.length) return scheduleAheadTime;
     scheduleAheadTime = s;
-    return my;
+    return loop;
   };
-  my.action = function(f) {
-    if (!arguments.length) return action;
-    action = f;
-    return my;
+  loop.limit = function(n) {
+    if (!arguments.length) return limit;
+    limit = n;
+    return loop;
   };
-  my.start = function() {
-    nextTickTime = ctx.currentTime;
-    timer = window.setTimeout(scheduler, lookahead);
+  loop.tick = function(f) {
+    if (!arguments.length) return tick;
+    tick = f;
+    return loop;
   };
-  my.stop = function() {
+  loop.start = function(t) {
+    nextTickTime = t || ctx.currentTime;
+    scheduler();
+    return loop;
+  };
+  loop.stop = function() {
     window.clearTimeout(timer);
+    return loop;
   };
-  my.reset = function() {
+  loop.reset = function() {
     currentTick = 0;
-  }
+    iterations = 0;
+    return loop;
+  };
 
-  return my;
+  return loop;
 
 };
 
@@ -161,8 +237,8 @@ blip.clip = function() {
       rate = 1,
       gain = 1;
 
-  var output = ctx.createGain();
-  output.connect(ctx.destination);
+  var outputGain = ctx.createGain();
+  outputGain.connect(ctx.destination);
 
   function clip() {}
 
@@ -190,8 +266,8 @@ blip.clip = function() {
     var source = ctx.createBufferSource();
     source.buffer = sample;
     source.playbackRate.value = rate;
-    source.connect(output);
-    output.gain.value = gain;
+    source.connect(outputGain);
+    outputGain.gain.value = gain;
     source.start(time);
   };
 
