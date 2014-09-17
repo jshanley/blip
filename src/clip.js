@@ -6,8 +6,8 @@ blip.clip = function() {
       rate = 1,
       gain = 1;
 
-  var output = ctx.createGain();
-  output.connect(ctx.destination);
+  var outputGain = ctx.createGain();
+  outputGain.connect(ctx.destination);
 
   function clip() {}
 
@@ -35,8 +35,8 @@ blip.clip = function() {
     var source = ctx.createBufferSource();
     source.buffer = sample;
     source.playbackRate.value = rate;
-    source.connect(output);
-    output.gain.value = gain;
+    source.connect(outputGain);
+    outputGain.gain.value = gain;
     source.start(time);
   };
 
