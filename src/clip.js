@@ -30,7 +30,7 @@ blip.clip = function() {
     if (!arguments.length) return gain;
     gain = number;
     return clip;
-  }
+  };
   clip.play = function(time) {
     var source = ctx.createBufferSource();
     source.buffer = sample;
