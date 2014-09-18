@@ -2,67 +2,87 @@
 
 var blip = {};
 var ctx = new AudioContext();
-blip.node = function() {
 
-  var reference,
-      id;
+/**
+ * Generates a GUID string.
+ * @returns {String} The generated GUID.
+ * @example af8a8416-6e18-a307-bd9c-f2c947bbb3aa
+ * @author Slavik Meltser (slavik@meltser.info).
+ * @link http://slavik.meltser.info/?p=142
+ */
+function guid() {
+    function _p8(s) {
+        var p = (Math.random().toString(16)+"000000000").substr(2,8);
+        return s ? "-" + p.substr(0,4) + "-" + p.substr(4,4) : p ;
+    }
+    return _p8() + _p8(true) + _p8(true) + _p8();
+}
 
-  var inputs = [],
-      outputs = [];
+
+// the associated functions will be used by the `createNode` function below
+var nodeTypes = {
+  'gain': ctx.createGain,
+  'delay': ctx.createDelay,
+  'panner': ctx.createPanner,
+  'convolver': ctx.createConvolver,
+  'analyser': ctx.createAnalyser,
+  'channelSplitter': ctx.createChannelSplitter,
+  'channelMerger': ctx.createChannelMerger,
+  'dynamicsCompressor': ctx.createDynamicsCompressor,
+  'biquadFilter': ctx.createBiquadFilter,
+  'waveShaper': ctx.createWaveShaper,
+  'oscillator': ctx.createOscillator,
+  'periodicWave': ctx.createPeriodicWave,
+  'bufferSource': ctx.createBufferSource,
+  'audioBufferSource': ctx.createBufferSource, // alias
+
+  // USER SHOULD NOT USE THESE DIRECTLY
+  // use `blip.listener` and `blip.destination` instead
+  'listener': function() { return ctx.listener; },
+  'destination': function() { return ctx.destination; }
+};
+
+blip.node = function(type) {
+
+  var other_args = Array.prototype.slice.call(arguments, 1);
+
+  var reference = createNode(type);
+
+  var id = guid();
 
   function node() {}
 
-  function rewireInputs(a) {
-    inputs.forEach(function(d) { d.node().disconnect(); })
-    a.forEach(function(d) { d.node().connect(reference); })
-    inputs = a;
-  }
-  function rewireOutputs(a) {
-    reference.disconnect();
-    a.forEach(function(d) { reference.connect(d.node())})
-    outputs = a;
+  function createNode(t) {
+    return nodeTypes[t].apply(ctx, other_args);
   }
 
-  node.wrap = function(audionode) {
-    reference = audionode;
-    return node;
-  };
-  node.create = function(f) {
-    reference = f.call(node, ctx);
-    return node;
-  }
   node.connect = function(blipnode) {
-    outputs.push(blipnode);
     reference.connect(blipnode.node())
     return node;
   };
-  node.inputs = function(a) {
-    if (!arguments.length) return inputs;
-    rewireInputs(a);
-    return node;
-  };
-  node.outputs = function(a) {
-    if (!arguments.length) return outputs;
-    outputs = a;
-    rewire();
-    return node;
-  };
-  node.param = function(name, value) {
-    if (!arguments.length) return node;
-    if (arguments.length === 2) {
-      reference[name].value = value;
+  node.param = function(name, f) {
+    if (arguments.length < 2) return reference[name];
+    if (typeof f !== 'function') {
+      reference[name].value = f;
     } else {
-      return reference[name].value;
+      f.call(reference[name]);
     }
     return node;
   };
   node.node = function() {
     return reference;
-  }
+  };
+  node.id = function() {
+    return id;
+  };
 
   return node;
 
 }
+
+// special nodes
+blip.destination = blip.node('destination');
+blip.listener = blip.node('listener');
 
 
 /*
@@ -237,8 +257,7 @@ blip.clip = function() {
       rate = 1,
       gain = 1;
 
-  var outputGain = ctx.createGain();
-  outputGain.connect(ctx.destination);
+  var gain = blip.node('gain').node()
 
   function clip() {}
 
@@ -263,7 +282,7 @@ blip.clip = function() {
     return clip;
   };
   clip.play = function(time) {
-    var source = ctx.createBufferSource();
+    var source = blip.node('bufferSource').node()
     source.buffer = sample;
     source.playbackRate.value = rate;
     source.connect(outputGain);
@@ -274,8 +293,8 @@ blip.clip = function() {
   return clip;
 }
 
-blip.__context = ctx;
-blip.__clips = loadedSamples;
+blip.getContext = function() { return ctx; };
+blip.getLoadedSamples = function() { return loadedSamples; };
 
 window.blip = blip;
 
