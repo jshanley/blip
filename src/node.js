@@ -1,61 +1,67 @@
-blip.node = function() {
+import "context";
+import "util";
 
-  var reference,
-      id;
+// the associated functions will be used by the `createNode` function below
+var nodeTypes = {
+  'gain': ctx.createGain,
+  'delay': ctx.createDelay,
+  'panner': ctx.createPanner,
+  'convolver': ctx.createConvolver,
+  'analyser': ctx.createAnalyser,
+  'channelSplitter': ctx.createChannelSplitter,
+  'channelMerger': ctx.createChannelMerger,
+  'dynamicsCompressor': ctx.createDynamicsCompressor,
+  'biquadFilter': ctx.createBiquadFilter,
+  'waveShaper': ctx.createWaveShaper,
+  'oscillator': ctx.createOscillator,
+  'periodicWave': ctx.createPeriodicWave,
+  'bufferSource': ctx.createBufferSource,
+  'audioBufferSource': ctx.createBufferSource, // alias
 
-  var inputs = [],
-      outputs = [];
+  // USER SHOULD NOT USE THESE DIRECTLY
+  // use `blip.listener` and `blip.destination` instead
+  'listener': function() { return ctx.listener; },
+  'destination': function() { return ctx.destination; }
+};
+
+blip.node = function(type) {
+
+  var other_args = Array.prototype.slice.call(arguments, 1);
+
+  var reference = createNode(type);
+
+  var id = guid();
 
   function node() {}
 
-  function rewireInputs(a) {
-    inputs.forEach(function(d) { d.node().disconnect(); })
-    a.forEach(function(d) { d.node().connect(reference); })
-    inputs = a;
-  }
-  function rewireOutputs(a) {
-    reference.disconnect();
-    a.forEach(function(d) { reference.connect(d.node())})
-    outputs = a;
+  function createNode(t) {
+    return nodeTypes[t].apply(ctx, other_args);
   }
 
-  node.wrap = function(audionode) {
-    reference = audionode;
-    return node;
-  };
-  node.create = function(f) {
-    reference = f.call(node, ctx);
-    return node;
-  }
   node.connect = function(blipnode) {
-    outputs.push(blipnode);
     reference.connect(blipnode.node())
     return node;
   };
-  node.inputs = function(a) {
-    if (!arguments.length) return inputs;
-    rewireInputs(a);
-    return node;
-  };
-  node.outputs = function(a) {
-    if (!arguments.length) return outputs;
-    outputs = a;
-    rewire();
-    return node;
-  };
-  node.param = function(name, value) {
-    if (!arguments.length) return node;
-    if (arguments.length === 2) {
-      reference[name].value = value;
+  node.param = function(name, f) {
+    if (arguments.length < 2) return reference[name];
+    if (typeof f !== 'function') {
+      reference[name].value = f;
     } else {
-      return reference[name].value;
+      f.call(reference[name]);
     }
     return node;
   };
   node.node = function() {
     return reference;
-  }
+  };
+  node.id = function() {
+    return id;
+  };
 
   return node;
 
 }
+
+// special nodes
+blip.destination = blip.node('destination');
+blip.listener = blip.node('listener');
