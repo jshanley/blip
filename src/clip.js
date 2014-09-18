@@ -1,4 +1,5 @@
 import "context";
+import "node";
 
 blip.clip = function() {
 
@@ -6,8 +7,7 @@ blip.clip = function() {
       rate = 1,
       gain = 1;
 
-  var outputGain = ctx.createGain();
-  outputGain.connect(ctx.destination);
+  var gain = blip.node('gain').node()
 
   function clip() {}
 
@@ -32,7 +32,7 @@ blip.clip = function() {
     return clip;
   };
   clip.play = function(time) {
-    var source = ctx.createBufferSource();
+    var source = blip.node('bufferSource').node()
     source.buffer = sample;
     source.playbackRate.value = rate;
     source.connect(outputGain);
