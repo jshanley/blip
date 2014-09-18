@@ -1,4 +1,4 @@
-node_modules
-*.wav
-index.html
 .DS_Store
+node_modules/
+wav/
+index.html
