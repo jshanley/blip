@@ -1,3 +1,5 @@
+import "context";
+
 var loadedSamples = {};
 
 blip.sampleLoader = function() {
@@ -43,7 +45,7 @@ blip.sampleLoader = function() {
     if (!arguments.length) return samples;
     samples = o;
     return loader;
-  }
+  };
   loader.each = function(f) {
     if (!arguments.length) return each;
     each = f;
