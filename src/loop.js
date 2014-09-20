@@ -47,11 +47,12 @@ blip.loop = function() {
     while (nextTickTime < ctx.currentTime + scheduleAheadTime) {
       scheduleTick(currentTick, nextTickTime);
       nextTick();
+      if (limit && iterations >= limit) {
+        loop.reset();
+        return;
+      }
     }
     timer = window.setTimeout(scheduler, lookahead);
-    if (limit && iterations >= limit) {
-      loop.stop().reset();
-    }
   }
 
   loop.tempo = function(bpm) {
