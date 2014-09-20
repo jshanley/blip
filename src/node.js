@@ -1,7 +1,7 @@
 import "context";
 import "util";
 
-// the associated functions will be used by the `createNode` function below
+// the associated functions will be used by the `createNode` function within `blip.node`
 var nodeTypes = {
   'gain': ctx.createGain,
   'delay': ctx.createDelay,
@@ -17,11 +17,92 @@ var nodeTypes = {
   'periodicWave': ctx.createPeriodicWave,
   'bufferSource': ctx.createBufferSource,
   'audioBufferSource': ctx.createBufferSource, // alias
+};
 
-  // USER SHOULD NOT USE THESE DIRECTLY
-  // use `blip.listener` and `blip.destination` instead
-  'listener': function() { return ctx.listener; },
-  'destination': function() { return ctx.destination; }
+function BlipNode() {
+  return this;
+};
+
+BlipNode.prototype = {
+
+  inputs: new BlipNodeCollection(),
+
+  outputs: new BlipNodeCollection(),
+
+  connect: function(blipnode) {
+    if (this.node().numberOfOutputs > 0 && blipnode.node().numberOfInputs > 0) {
+      this.node().connect(blipnode.node());
+      this.outputs.add(blipnode);
+      blipnode.inputs.add(this);
+    }
+    return this;
+  },
+
+  disconnect: function(blipnode) {
+    // disconnect all
+    this.node().disconnect();
+
+    if (blipnode) {
+      this.outputs.remove(blipnode);
+      blipnode.inputs.remove(this);
+
+      // reconnect to remaining outputs
+      this.outputs.each(function(d) { this.connect(d); })
+    } else {
+      this.outputs.each(function(d) {
+        d.inputs.remove(this);
+      });
+      this.outputs.removeAll();
+    }
+
+    return this;
+  },
+
+  prop: function(name, value) {
+    if (arguments.length < 2) {
+      if (typeof name === 'object') {
+        for (var p in name) {
+          this.node()[p] = name[p];
+        }
+        return this;
+      } else {
+        return this.node()[name];
+      }
+    }
+    this.node()[name] = value;
+    return this;
+  },
+
+  param: function(name, f) {
+    if (arguments.length < 2) return this.node()[name];
+    if (typeof f !== 'function') {
+      this.node()[name].value = f;
+    } else {
+      f.call(this.node()[name]);
+    }
+    return this;
+  },
+
+  start: function(t) {
+    this.node().start.call(this.node(), t);
+  },
+
+  stop: function(t) {
+    this.node().stop.call(this.node(), t);
+  },
+
+  node: function() {
+    return this.node();
+  },
+
+  toString: function() {
+    return '[object BlipNode]';
+  },
+
+  valueOf: function() {
+    return this.id();
+  }
+
 };
 
 blip.node = function(type) {
@@ -32,28 +113,16 @@ blip.node = function(type) {
 
   var id = guid();
 
-  function node() {}
+  var node = new BlipNode();
 
   function createNode(t) {
     return nodeTypes[t].apply(ctx, other_args);
   }
 
-  node.connect = function(blipnode) {
-    reference.connect(blipnode.node())
-    return node;
-  };
-  node.param = function(name, f) {
-    if (arguments.length < 2) return reference[name];
-    if (typeof f !== 'function') {
-      reference[name].value = f;
-    } else {
-      f.call(reference[name]);
-    }
-    return node;
-  };
   node.node = function() {
     return reference;
   };
+
   node.id = function() {
     return id;
   };
@@ -62,6 +131,14 @@ blip.node = function(type) {
 
 }
 
+var specialBlipNode = function(ref) {
+  var node = new BlipNode();
+  var id = guid();
+  node.node = function() { return ref; };
+  node.id = function() { return id; };
+  return node;
+}
+
 // special nodes
-blip.destination = blip.node('destination');
-blip.listener = blip.node('listener');
+blip.destination = specialBlipNode(ctx.destination);
+blip.listener = specialBlipNode(ctx.listener);
