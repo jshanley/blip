@@ -7,7 +7,9 @@ blip.clip = function() {
       rate = 1,
       gain = 1;
 
-  var gain = blip.node('gain').node()
+  var chain = null;
+
+  var output_gain = blip.node('gain').connect(blip.destination);
 
   function clip() {}
 
@@ -31,12 +33,37 @@ blip.clip = function() {
     gain = number;
     return clip;
   };
-  clip.play = function(time) {
-    var source = blip.node('bufferSource').node()
+  clip.chain = function(c) {
+    if (!arguments.length) return chain;
+    chain = c;
+    output_gain.disconnect(blip.destination);
+    chain.from(output_gain).to(blip.destination);
+    return clip;
+  };
+  clip.play = function(time, params) {
+    var source = ctx.createBufferSource();
     source.buffer = sample;
-    source.playbackRate.value = rate;
-    source.connect(outputGain);
-    outputGain.gain.value = gain;
+
+    if (params) {
+      if (typeof params.gain !== 'undefined') {
+        if (typeof params.gain === 'function') {
+          output_gain.param('gain', params.gain)
+        } else {
+          output_gain.param('gain', function() {
+            this.setValueAtTime(params.gain, time)
+          })
+        }
+      }
+      if (typeof params.rate !== 'undefined') {
+        if (typeof params.rate === 'function') {
+          BlipNode.prototype.param.call(specialBlipNode(source), 'playbackRate', params.rate)
+        } else {
+          source.playbackRate.setValueAtTime(params.rate, time)
+        }
+      }
+    }
+
+    source.connect(output_gain.node());
     source.start(time);
   };
 
