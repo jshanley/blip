@@ -18,8 +18,42 @@ function guid() {
     return _p8() + _p8(true) + _p8(true) + _p8();
 }
 
+function BlipNodeCollection(nodes) {
+  this.nodes = nodes || [];
+}
 
-// the associated functions will be used by the `createNode` function below
+BlipNodeCollection.prototype = {
+
+  each: function(f) {
+    for (var i = 0; i < this.nodes.length; i++) {
+      f.call(this, this.nodes[i], i, this.nodes);
+    }
+  },
+
+  contains: function(node) {
+    for (var i = 0; i < this.nodes.length; i++) {
+      if (this.nodes[i] === node) return true;
+    }
+    return false;
+  },
+
+  add: function(node) {
+    if (this.nodes.indexOf(node) === -1) this.nodes.push(node);
+  },
+
+  remove: function(node) {
+    var index = this.nodes.indexOf(node);
+    if (index !== -1) this.nodes.splice(index, 1);
+  },
+
+  removeAll: function() {
+    this.nodes = [];
+  }
+
+};
+
+
+// the associated functions will be used by the `createNode` function within `blip.node`
 var nodeTypes = {
   'gain': ctx.createGain,
   'delay': ctx.createDelay,
@@ -35,11 +69,92 @@ var nodeTypes = {
   'periodicWave': ctx.createPeriodicWave,
   'bufferSource': ctx.createBufferSource,
   'audioBufferSource': ctx.createBufferSource, // alias
+};
 
-  // USER SHOULD NOT USE THESE DIRECTLY
-  // use `blip.listener` and `blip.destination` instead
-  'listener': function() { return ctx.listener; },
-  'destination': function() { return ctx.destination; }
+function BlipNode() {
+  return this;
+};
+
+BlipNode.prototype = {
+
+  inputs: new BlipNodeCollection(),
+
+  outputs: new BlipNodeCollection(),
+
+  connect: function(blipnode) {
+    if (this.node().numberOfOutputs > 0 && blipnode.node().numberOfInputs > 0) {
+      this.node().connect(blipnode.node());
+      this.outputs.add(blipnode);
+      blipnode.inputs.add(this);
+    }
+    return this;
+  },
+
+  disconnect: function(blipnode) {
+    // disconnect all
+    this.node().disconnect();
+
+    if (blipnode) {
+      this.outputs.remove(blipnode);
+      blipnode.inputs.remove(this);
+
+      // reconnect to remaining outputs
+      this.outputs.each(function(d) { this.connect(d); })
+    } else {
+      this.outputs.each(function(d) {
+        d.inputs.remove(this);
+      });
+      this.outputs.removeAll();
+    }
+
+    return this;
+  },
+
+  prop: function(name, value) {
+    if (arguments.length < 2) {
+      if (typeof name === 'object') {
+        for (var p in name) {
+          this.node()[p] = name[p];
+        }
+        return this;
+      } else {
+        return this.node()[name];
+      }
+    }
+    this.node()[name] = value;
+    return this;
+  },
+
+  param: function(name, f) {
+    if (arguments.length < 2) return this.node()[name];
+    if (typeof f !== 'function') {
+      this.node()[name].value = f;
+    } else {
+      f.call(this.node()[name]);
+    }
+    return this;
+  },
+
+  start: function(t) {
+    this.node().start.call(this.node(), t);
+  },
+
+  stop: function(t) {
+    this.node().stop.call(this.node(), t);
+  },
+
+  node: function() {
+    return this.node();
+  },
+
+  toString: function() {
+    return '[object BlipNode]';
+  },
+
+  valueOf: function() {
+    return this.id();
+  }
+
 };
 
 blip.node = function(type) {
@@ -50,28 +165,16 @@ blip.node = function(type) {
 
   var id = guid();
 
-  function node() {}
+  var node = new BlipNode();
 
   function createNode(t) {
     return nodeTypes[t].apply(ctx, other_args);
   }
 
-  node.connect = function(blipnode) {
-    reference.connect(blipnode.node())
-    return node;
-  };
-  node.param = function(name, f) {
-    if (arguments.length < 2) return reference[name];
-    if (typeof f !== 'function') {
-      reference[name].value = f;
-    } else {
-      f.call(reference[name]);
-    }
-    return node;
-  };
   node.node = function() {
     return reference;
   };
+
   node.id = function() {
     return id;
   };
@@ -80,9 +183,60 @@ blip.node = function(type) {
 
 }
 
+var specialBlipNode = function(ref) {
+  var node = new BlipNode();
+  var id = guid();
+  node.node = function() { return ref; };
+  node.id = function() { return id; };
+  return node;
+}
+
 // special nodes
-blip.destination = blip.node('destination');
-blip.listener = blip.node('listener');
+blip.destination = specialBlipNode(ctx.destination);
+blip.listener = specialBlipNode(ctx.listener);
+blip.chain = function(nodes) {
+
+  nodes = nodes || [];
+
+  wire();
+
+  function chain() {}
+
+  function wire() {
+    for (var i = 0; i < nodes.length-1; i++) {
+      nodes[i].connect(nodes[i+1]);
+    }
+  }
+
+  chain.node = function(blipnode) {
+    nodes.push(blipnode);
+    wire();
+    return chain;
+  };
+  chain.start = function() {
+    var a = nodes.slice(0,1);
+    return a.length ? a[0] : null;
+  };
+  chain.end = function() {
+    var a = nodes.slice(-1);
+    console.log(a);
+    return a.length ? a[0] : null;
+  };
+  chain.from = function(blipnode) {
+    blipnode.connect(chain.start());
+    return chain;
+  };
+  chain.to = function(blipnode) {
+    chain.end().connect(blipnode);
+    return chain;
+  };
+  chain.wire = function() {
+    wire();
+    return chain;
+  }
+
+  return chain;
+}
 
 
 /*
@@ -132,11 +286,12 @@ blip.loop = function() {
     while (nextTickTime < ctx.currentTime + scheduleAheadTime) {
       scheduleTick(currentTick, nextTickTime);
       nextTick();
+      if (limit && iterations >= limit) {
+        loop.reset();
+        return;
+      }
     }
     timer = window.setTimeout(scheduler, lookahead);
-    if (limit && iterations >= limit) {
-      loop.stop().reset();
-    }
   }
 
   loop.tempo = function(bpm) {
@@ -188,6 +343,7 @@ blip.loop = function() {
 
 };
 
+
 var loadedSamples = {};
 
 blip.sampleLoader = function() {
@@ -233,7 +389,7 @@ blip.sampleLoader = function() {
     if (!arguments.length) return samples;
     samples = o;
     return loader;
-  }
+  };
   loader.each = function(f) {
     if (!arguments.length) return each;
     each = f;
@@ -257,7 +413,9 @@ blip.clip = function() {
       rate = 1,
       gain = 1;
 
-  var gain = blip.node('gain').node()
+  var chain = null;
+
+  var output_gain = blip.node('gain').connect(blip.destination);
 
   function clip() {}
 
@@ -281,12 +439,37 @@ blip.clip = function() {
     gain = number;
     return clip;
   };
-  clip.play = function(time) {
-    var source = blip.node('bufferSource').node()
+  clip.chain = function(c) {
+    if (!arguments.length) return chain;
+    chain = c;
+    output_gain.disconnect(blip.destination);
+    chain.from(output_gain).to(blip.destination);
+    return clip;
+  };
+  clip.play = function(time, params) {
+    var source = ctx.createBufferSource();
     source.buffer = sample;
-    source.playbackRate.value = rate;
-    source.connect(outputGain);
-    outputGain.gain.value = gain;
+
+    if (params) {
+      if (typeof params.gain !== 'undefined') {
+        if (typeof params.gain === 'function') {
+          output_gain.param('gain', params.gain)
+        } else {
+          output_gain.param('gain', function() {
+            this.setValueAtTime(params.gain, time)
+          })
+        }
+      }
+      if (typeof params.rate !== 'undefined') {
+        if (typeof params.rate === 'function') {
+          BlipNode.prototype.param.call(specialBlipNode(source), 'playbackRate', params.rate)
+        } else {
+          source.playbackRate.setValueAtTime(params.rate, time)
+        }
+      }
+    }
+
+    source.connect(output_gain.node());
     source.start(time);
   };
 
@@ -295,6 +478,9 @@ blip.clip = function() {
 
 blip.getContext = function() { return ctx; };
 blip.getLoadedSamples = function() { return loadedSamples; };
+blip.sample = function(name) {
+  return loadedSamples[name];
+}
 
 window.blip = blip;
 
