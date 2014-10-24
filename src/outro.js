@@ -4,6 +4,9 @@ blip.sample = function(name) {
   return loadedSamples[name];
 }
 
+// TESTING
+var testing = '123';
+
 window.blip = blip;
 
 })()
