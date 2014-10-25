@@ -4,6 +4,10 @@ function BlipNodeCollection(nodes) {
 
 BlipNodeCollection.prototype = {
 
+  count: function() {
+    return this.nodes.length;
+  },
+
   each: function(f) {
     for (var i = 0; i < this.nodes.length; i++) {
       f.call(this, this.nodes[i], i, this.nodes);

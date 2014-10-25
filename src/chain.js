@@ -4,7 +4,7 @@ blip.chain = function(nodes) {
 
   wire();
 
-  function chain() {}
+  var chain = {};
 
   function wire() {
     for (var i = 0; i < nodes.length-1; i++) {
@@ -23,7 +23,6 @@ blip.chain = function(nodes) {
   };
   chain.end = function() {
     var a = nodes.slice(-1);
-    console.log(a);
     return a.length ? a[0] : null;
   };
   chain.from = function(blipnode) {

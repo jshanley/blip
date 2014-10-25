@@ -24,6 +24,10 @@ function BlipNodeCollection(nodes) {
 
 BlipNodeCollection.prototype = {
 
+  count: function() {
+    return this.nodes.length;
+  },
+
   each: function(f) {
     for (var i = 0; i < this.nodes.length; i++) {
       f.call(this, this.nodes[i], i, this.nodes);
@@ -72,14 +76,12 @@ var nodeTypes = {
 };
 
 function BlipNode() {
+  this.inputs = new BlipNodeCollection();
+  this.outputs = new BlipNodeCollection();
   return this;
 };
 
 BlipNode.prototype = {
-
-  inputs: new BlipNodeCollection(),
-
-  outputs: new BlipNodeCollection(),
 
   connect: function(blipnode) {
     if (this.node().numberOfOutputs > 0 && blipnode.node().numberOfInputs > 0) {
@@ -94,15 +96,17 @@ BlipNode.prototype = {
     // disconnect all
     this.node().disconnect();
 
+    var me = this;
+
     if (blipnode) {
       this.outputs.remove(blipnode);
       blipnode.inputs.remove(this);
 
       // reconnect to remaining outputs
-      this.outputs.each(function(d) { this.connect(d); })
+      this.outputs.each(function(n) { this.connect(n); })
     } else {
-      this.outputs.each(function(d) {
-        d.inputs.remove(this);
+      this.outputs.each(function(n) {
+        n.inputs.remove(me);
       });
       this.outputs.removeAll();
     }
@@ -200,7 +204,7 @@ blip.chain = function(nodes) {
 
   wire();
 
-  function chain() {}
+  var chain = {};
 
   function wire() {
     for (var i = 0; i < nodes.length-1; i++) {
@@ -219,7 +223,6 @@ blip.chain = function(nodes) {
   };
   chain.end = function() {
     var a = nodes.slice(-1);
-    console.log(a);
     return a.length ? a[0] : null;
   };
   chain.from = function(blipnode) {

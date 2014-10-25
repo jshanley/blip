@@ -20,14 +20,12 @@ var nodeTypes = {
 };
 
 function BlipNode() {
+  this.inputs = new BlipNodeCollection();
+  this.outputs = new BlipNodeCollection();
   return this;
 };
 
 BlipNode.prototype = {
-
-  inputs: new BlipNodeCollection(),
-
-  outputs: new BlipNodeCollection(),
 
   connect: function(blipnode) {
     if (this.node().numberOfOutputs > 0 && blipnode.node().numberOfInputs > 0) {
@@ -42,15 +40,17 @@ BlipNode.prototype = {
     // disconnect all
     this.node().disconnect();
 
+    var me = this;
+
     if (blipnode) {
       this.outputs.remove(blipnode);
       blipnode.inputs.remove(this);
 
       // reconnect to remaining outputs
-      this.outputs.each(function(d) { this.connect(d); })
+      this.outputs.each(function(n) { this.connect(n); })
     } else {
-      this.outputs.each(function(d) {
-        d.inputs.remove(this);
+      this.outputs.each(function(n) {
+        n.inputs.remove(me);
       });
       this.outputs.removeAll();
     }
