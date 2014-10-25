@@ -78,7 +78,7 @@ rhythmic.start();
 ``` javascript
 var melodic = blip.loop()
   .tempo(120)
-  .data(0.3,0.4,0.5,0.6)
+  .data([0.3,0.4,0.5,0.6])
   .tick(function(t,d) {
     clip.play(t, { 'rate': d });
   })
