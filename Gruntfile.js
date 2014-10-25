@@ -33,6 +33,14 @@ module.exports = function(grunt) {
         src: 'src/index.js',
         dest: './blip.js'
       }
+    },
+
+    uglify: {
+      dist: {
+        files: {
+          './blip.min.js': ['./blip.js']
+        }
+      }
     }
 
   });
@@ -40,8 +48,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-smash');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  grunt.registerTask('build', ['smash']);
-  grunt.registerTask('preview', ['smash', 'connect', 'watch']);
-  grunt.registerTask('default', ['smash', 'connect', 'watch']);
+  grunt.registerTask('build', ['smash', 'uglify']);
+  grunt.registerTask('preview', ['smash', 'uglify', 'connect', 'watch']);
+  grunt.registerTask('default', ['build']);
 }
