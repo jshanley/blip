@@ -41,6 +41,8 @@ snare.play(5);
 
 ## Looping
 
+These examples assume the variable `clip` is a blip clip.
+
 ### Basic Looping
 
 *A loop generates "ticks" at a specific tempo, and allows you to schedule events based on the time of each tick.*
