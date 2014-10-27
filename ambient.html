@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Blip Example</title>
-  <script src="blip.js"></script>
+  <script src="blip.min.js"></script>
 </head>
 <body>
   <button id="play">play</button>
@@ -11,7 +11,7 @@
 <script>
   blip.sampleLoader()
     .samples({
-      'uke': 'wav/ukeC.wav'
+      'uke': 'sounds/ukeC.wav'
     })
     .done(loaded)
     .load();
