@@ -41,7 +41,7 @@ function loaded() {
     $('#example2-play').hide();
     $('#example2-pause').show();
     loop.start();
-    window.currentBlips = [bassLoop, cymbalLoop, guitarLoop];
+    window.currentBlips = [loop];
   });
   document.getElementById('example2-pause').addEventListener('click', function() {
     if(window.currentBlips){
