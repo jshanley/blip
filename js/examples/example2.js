@@ -1,8 +1,8 @@
 blip.sampleLoader()
   .samples({
-    'glass': 'wav/glass.wav',
-    'plastic': 'wav/plastic.wav',
-    'can': 'wav/cokecan.wav'
+    'glass': 'sounds/glass.wav',
+    'plastic': 'sounds/plastic.wav',
+    'can': 'sounds/cokecan.wav'
   })
   .done(loaded)
   .load();
