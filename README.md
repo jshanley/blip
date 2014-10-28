@@ -110,4 +110,6 @@ var entropic = blip.loop()
 entropic.start();
 ```
 
+Visit the [**site**](http://jshanley.github.io/blip/) for more examples.
+
 
