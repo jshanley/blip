@@ -31,14 +31,14 @@ function callback() {
 *A clip is a wrapper for a sample, which handles creating and wiring up a BufferSource each time the sound is played.*
 
 ``` javascript
-var snare = blip.clip()
-  .sample('snare');
+var bassDrum = blip.clip()
+  .sample('bassDrum');
 
 // play the clip immediately
-snare.play();
+bassDrum.play();
 
 // play the clip again in 5 seconds
-snare.play(5);
+bassDrum.play(5);
 ```
 
 ## Looping
