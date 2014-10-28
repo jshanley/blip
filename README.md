@@ -2,6 +2,8 @@
 
 **blip** is a lightweight JavaScript library that wraps the Web Audio API, abstracting away the AudioContext, and simplifying node creation and audio routing. It also provides some extremely powerful and flexible methods for looping and manipulating samples that allow for both temporal precision and musical expressiveness.
 
+> Visit the [**site**](http://jshanley.github.io/blip/) >>
+
 ## Getting Started
 
 ### Loading Samples
