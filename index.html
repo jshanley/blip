@@ -33,19 +33,45 @@
         <div class="col-md-1 col-md-offset-2 vcenter">
           <h1 class="header-item">Blip.</h1>
         </div>
-        <div class="col-md-1 col-md-offset-5 vcenter">
+        <div class="col-md-1 vcenter">
           <div><img src="img/blip.png" class="logo"></div>
         </div>
       </div>
-      <div class="row"> 
+      <div class="row">
         <div class="col-md-8 col-md-offset-2">
           <p>Blip is an audio library for looping and sampling with the Web Audio API. Inspired by ______, blip was created to provide an intuitive interface with powerful capabilities. Audio samples can be transformed through a series of chained methods, each altering different aspects of the sound.</p>
         </div>
       </div>
       <div class="row">
         <div class="col-md-8 col-md-offset-2">
-          <h3>Examples</h3>
-          <p>Load some shit into your browser</p>
+          <h4>Examples</h4>
+          <button type="button" class="btn btn-default btn-sm" id="example1-play">
+            <span class="glyphicon glyphicon-play"></span> Ambient
+          </button>
+          <button type="button" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-play"></span> BlaBleeBlook
+          </button>
+          <button type="button" class="btn btn-default btn-sm" id="example1-play">
+            <span class="glyphicon glyphicon-play"></span> Coolio
+          </button>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+          <h4>Download / Install</h4>
+          <ul>
+            <li>Download <a href="#">blip.min.js</a></li>
+            <li>npm install blip</li>
+            <li>bower install blip</li>
+            <li>Use <a href="#">CDNJS</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+          <h4>Loading in Samples</h4>
+          <p>Blip helps you load samples asynchronously, and gives you a simple callback mechanism to ensure that your samples are ready to use.</p>
           <pre class="brush: js">
             blip.sampleLoader()
               .samples({
@@ -61,7 +87,6 @@
               blip.sample('snare') // is an AudioBuffer
             }
           </pre>
-          <button class="btn btn-small btn-default" id="example1-play">Play</button> <button class="btn btn-small btn-default" id="example1-stop">Stop</button>
         </div>
       </div>
     </div>
