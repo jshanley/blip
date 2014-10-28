@@ -35,7 +35,7 @@ var bassDrum = blip.clip()
   .sample('bassDrum');
 
 // play the clip immediately
-bassDrum.play();
+bassDrum.play(0);
 
 // play the clip again in 5 seconds
 bassDrum.play(5);
