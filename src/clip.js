@@ -41,6 +41,7 @@ blip.clip = function() {
     return clip;
   };
   clip.play = function(time, params) {
+    time = time || 0;
     var source = ctx.createBufferSource();
     source.buffer = sample;
 
