@@ -74,7 +74,6 @@
           <ul>
             <li>Download <a href="#">blip.min.js</a></li>
             <li>bower install blip</li>
-            <li>Use <a href="#">CDNJS</a></li>
           </ul>
         </div>
       </div>
@@ -105,15 +104,18 @@
           <h3>Creating Clips</h3>
           <p>A clip is a wrapper for a sample, which handles creating and wiring up a BufferSource each time the sound is played.</p>
           <pre class="brush: js;">
-            var snare = blip.clip()
-              .sample('snare');
+            var bassDrum = blip.clip()
+              .sample('bassDrum');
             
             // play the clip immediately
-            snare.play();
+            bassDrum.play(0);
             
             // play the clip again in 5 seconds
-            snare.play(5);
+            bassDrum.play(5);
           </pre>
+        </div>
+        <div class="col-md-8 col-md-offset-2">
+          <a href="http://jsfiddle.net/q8jt8o36/4/">Fiddle</a>
         </div>
       </div>
       <div class="row">
@@ -135,6 +137,7 @@
             
             monotonous.start();
           </pre>
+          <a href="http://jsfiddle.net/q8jt8o36/6/">Fiddle</a>
           <h3>Better Looping</h3>
           <p>Loops can take an array of arbitrary data to loop over, and the current datum is passed as the second argument to the tick callback.</p>
           <pre class="brush: js;">
@@ -149,6 +152,7 @@
             
             rhythmic.start();
           </pre>
+          <a href="http://jsfiddle.net/q8jt8o36/9/">Fiddle</a>
           <h3>Awesome Looping</h3>
           <p>The data passed in can represent anything you want it to. In this case it is being used to set the playback rate of the clip.</p>
           <pre class="brush: js;">
@@ -161,6 +165,7 @@
             
             melodic.start();            
           </pre>
+          <a href="http://jsfiddle.net/q8jt8o36/10/">Fiddle</a>
           <h3>Add some randomness</h3>
           <p>Blip provides helper functions to add elements of randomness and chance to your compositions.</p>
 
@@ -174,6 +179,7 @@
             
             entropic.start();
           </pre>
+          <a href="http://jsfiddle.net/q8jt8o36/11/">Fiddle</a>
         </div>
       </div>
 
