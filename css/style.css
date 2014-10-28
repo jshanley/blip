@@ -23,3 +23,20 @@ p {
   vertical-align: middle;
   float: none;
 }
+
+.examples {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.example-fiddle {
+  margin-left: 10px;
+}
+
+h2 {
+  margin-top: 50px;
+}
+
+h3 {
+  margin-top: 50px; 
+}

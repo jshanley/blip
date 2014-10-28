@@ -47,25 +47,30 @@
       </div>
       <div class="row">
         <div class="col-md-8 col-md-offset-2">
-          <h4>Examples</h4>
+          <h2>Examples</h2>
+        </div>
+        <div class="col-md-8 col-md-offset-2 examples">
           <button type="button" class="btn btn-default btn-sm play-button" id="example1-play">
             <span class="glyphicon glyphicon-play"></span> ambient
           </button>
           <button type="button" class="btn btn-default btn-sm pause-button" id="example1-pause" style="display: none;">
             <span class="glyphicon glyphicon-pause"></span> ambient
           </button>
+          <a href="#" class="example-fiddle">Fiddle</a>
+        </div>
+        <div class="col-md-8 col-md-offset-2 examples">
           <button type="button" class="btn btn-default btn-sm play-button" id="example2-play">
             <span class="glyphicon glyphicon-play"></span> ominous
           </button>
           <button type="button" class="btn btn-default btn-sm pause-button" id="example2-pause" style="display: none;">
             <span class="glyphicon glyphicon-pause"></span> ominous
           </button>
-
+          <a href="#" class="example-fiddle">Fiddle</a>
         </div>
       </div>
       <div class="row">
         <div class="col-md-8 col-md-offset-2">
-          <h4>Download / Install</h4>
+          <h2>Download / Install</h2>
           <ul>
             <li>Download <a href="#">blip.min.js</a></li>
             <li>bower install blip</li>
@@ -75,7 +80,8 @@
       </div>
       <div class="row">
         <div class="col-md-8 col-md-offset-2">
-          <h4>Loading in Samples</h4>
+          <h2>Getting Started</h2>
+          <h3>Loading in Samples</h3>
           <p>Blip helps you load samples asynchronously, and gives you a simple callback mechanism to ensure that your samples are ready to use.</p>
           <pre class="brush: js">
             blip.sampleLoader()
@@ -94,6 +100,83 @@
           </pre>
         </div>
       </div>
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+          <h3>Creating Clips</h3>
+          <p>A clip is a wrapper for a sample, which handles creating and wiring up a BufferSource each time the sound is played.</p>
+          <pre class="brush: js;">
+            var snare = blip.clip()
+              .sample('snare');
+            
+            // play the clip immediately
+            snare.play();
+            
+            // play the clip again in 5 seconds
+            snare.play(5);
+          </pre>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+          <h2>Looping</h2>
+          <p>Blip enables you to create precise loops for playing samples, controlling audio parameters, or just about anything else you can think of by letting you deal directly with time, and providing an simple and elegant scheduling mechanism.</p>
+
+          <p>A loop simply provides markers for points in time, to which you can assign arbitrary data, and fire playback events.</p>
+
+          <p>These examples assume the variable clip is a blip clip.</p>
+          <h3>Basic Looping</h3>
+          <p>A loop generates "ticks" at a specific tempo, and allows you to schedule events based on the time of each tick.</p>
+          <pre class="brush: js;">
+            var monotonous = blip.loop()
+              .tempo(110)
+              .tick(function(t) {
+                clip.play(t)
+              });
+            
+            monotonous.start();
+          </pre>
+          <h3>Better Looping</h3>
+          <p>Loops can take an array of arbitrary data to loop over, and the current datum is passed as the second argument to the tick callback.</p>
+          <pre class="brush: js;">
+            var rhythmic = blip.loop()
+              .tempo(130)
+              .data([1,0,1,1,0])
+              .tick(function(t,d) {
+                if (d) {
+                  clip.play(t)
+                }
+              });
+            
+            rhythmic.start();
+          </pre>
+          <h3>Awesome Looping</h3>
+          <p>The data passed in can represent anything you want it to. In this case it is being used to set the playback rate of the clip.</p>
+          <pre class="brush: js;">
+            var melodic = blip.loop()
+              .tempo(120)
+              .data([0.3,0.4,0.5,0.6])
+              .tick(function(t,d) {
+                clip.play(t, { 'rate': d });
+              })
+            
+            melodic.start();            
+          </pre>
+          <h3>Add some randomness</h3>
+          <p>Blip provides helper functions to add elements of randomness and chance to your compositions.</p>
+
+          <p>This loop has a 1/3 chance to play a clip on each tick, and assigns it a random rate between 0.2 and 1.4</p>
+          <pre class="brush: js;">
+            var entropic = blip.loop()
+              .tempo(110)
+              .tick(function(t,d) {
+                if (blip.chance(1/3)) clip.play(t, { 'rate': blip.random(0.2, 1.4) });
+              })
+            
+            entropic.start();
+          </pre>
+        </div>
+      </div>
+
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
