@@ -38,6 +38,8 @@ function loaded() {
         window.currentBlips[blipIndex].stop();
       }
     }
+    $('.play-button').show();
+    $('.pause-button').hide();
     $('#example1-play').hide();
     $('#example1-pause').show();
     bass.start();
