@@ -43,7 +43,7 @@ bassDrum.play(5);
 
 ## Looping
 
-Blip enables you to create precise loops for playing samples, controlling audio parameters, or just about anything else you can think of by letting you deal directly with time, and providing an simple and elegant scheduling mechanism.
+Blip enables you to create precise loops for playing samples, controlling audio parameters, or just about anything else you can think of by letting you deal directly with time, and providing a simple and elegant scheduling mechanism.
 
 A loop simply provides markers for points in time, to which you can assign arbitrary data, and fire playback events. 
 
