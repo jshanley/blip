@@ -1,6 +1,7 @@
 blip.sampleLoader()
   .samples({
-    'uke': 'sounds/ukeC.wav'
+    'bass': 'sounds/bassdrum.wav',
+    'cymbal': 'sounds/cymbal.wav'
   })
   .done(loaded)
   .load();
@@ -11,47 +12,38 @@ function loaded() {
   var TEMPO = 86;
 
   // create clips
-  var uke1 = blip.clip().sample('uke');
-  var uke2 = blip.clip().sample('uke');
+  var bass = blip.clip().sample('bass');
+  var cymbal = blip.clip().sample('cymbal');
 
   /* ====================== LOOPS ====================== */
-  var bass = blip.loop()
+  var bassLoop = blip.loop()
     .tempo(TEMPO)
-    .data([1/2, 1/2, 3/4, 1/2, 1/3])
+    .data([1, 1, 1, 0, 0, 1, 1])
     .tick(function(t,d) {
-      if (blip.chance(4/5)) uke1.play(t, { rate: d, gain: 0.5 / Math.sqrt(d) });
+      if (d) bass.play(t, { rate: d });
     })
 
-  var melody = blip.loop()
-    .tempo(TEMPO * 2)
-    .data([3/2, 2, 3, 5/4, 5/2, 5/8])
-    .tick(function(t,d) {
-      if (blip.chance(1/3)) uke2.play(t, { rate: d, gain: 0.4 })
-      if (blip.chance(1/6)) uke2.play(t, { rate: d * 3/2, gain: 0.4})
-    });
-
   /* click events */
-  document.getElementById('example1-play').addEventListener('click', function() {
+  document.getElementById('example2-play').addEventListener('click', function() {
     if(window.currentBlips){
       var blipLength = window.currentBlips.length;
       for (var blipIndex = 0; blipIndex < blipLength; blipIndex++){
         window.currentBlips[blipIndex].stop();
       }
     }
-    $('#example1-play').hide();
-    $('#example1-pause').show();
-    bass.start();
-    melody.start();
-    window.currentBlips = [bass, melody];
+    $('#example2-play').hide();
+    $('#example2-pause').show();
+    bassLoop.start();
+    window.currentBlips = [bassLoop];
   });
-  document.getElementById('example1-pause').addEventListener('click', function() {
+  document.getElementById('example2-pause').addEventListener('click', function() {
     if(window.currentBlips){
       var blipLength = window.currentBlips.length;
       for (var blipIndex = 0; blipIndex < blipLength; blipIndex++){
         window.currentBlips[blipIndex].stop();
       }
     }
-    $('#example1-play').show();
-    $('#example1-pause').hide();
+    $('#example2-play').show();
+    $('#example2-pause').hide();
   });
 }
