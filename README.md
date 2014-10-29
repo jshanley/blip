@@ -6,6 +6,8 @@
 
 ## Getting Started
 
+> Browse the [**API Docs**](https://github.com/jshanley/blip/wiki/API-Documentation) >>
+
 ### Loading Samples
 
 *Blip helps you load samples asynchronously, and gives you a simple callback mechanism to ensure that your samples are ready to use.*
