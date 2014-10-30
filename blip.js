@@ -302,6 +302,7 @@ blip.loop = function() {
       nextTickTime = 0;
 
   var tick = function(t, d, i) {};
+  var each = function(t, i) {};
 
   var iterations = 0,
       limit = 0;
@@ -326,9 +327,16 @@ blip.loop = function() {
     tick.call(loop, time, data[tickNum], tickNum);
   }
 
+  function scheduleIteration(iterationNum, time) {
+    each.call(loop, time, iterationNum);
+  }
+
   function scheduler() {
     while (nextTickTime < ctx.currentTime + scheduleAheadTime) {
       scheduleTick(currentTick, nextTickTime);
+      if (currentTick === 0) {
+        scheduleIteration(iterations, nextTickTime);
+      }
       nextTick();
       if (limit && iterations >= limit) {
         loop.reset();
@@ -368,6 +376,11 @@ blip.loop = function() {
     tick = f;
     return loop;
   };
+  loop.each = function(f) {
+    if (!arguments.length) return each;
+    each = f;
+    return loop;
+  }
   loop.start = function(t) {
     nextTickTime = t || ctx.currentTime;
     scheduler();
