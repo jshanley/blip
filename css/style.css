@@ -38,9 +38,23 @@ h2 {
 }
 
 h3 {
-  margin-top: 50px; 
+  margin-top: 50px;
 }
 
 .created-by {
   margin-top: 75px;
+}
+
+ul {
+  list-style: none;
+  margin-left: -1em;
+}
+
+ul li {
+  margin-bottom: 0.25em;
+}
+
+ul li::before {
+  content: '↳';
+  margin: 1em;
 }
