@@ -13,6 +13,8 @@ blip.loop = function() {
 
   var tempo; // ticks per minute
 
+  var tickInterval; // seconds per tick
+
   var data = [];
 
   var currentTick = 0,
@@ -28,8 +30,7 @@ blip.loop = function() {
   function loop() {}
 
   function nextTick() {
-    var secondsPerTick = 60 / tempo;
-    nextTickTime += secondsPerTick;
+    nextTickTime += tickInterval;
 
     // cycle through ticks
     if (++currentTick >= data.length) {
@@ -58,6 +59,13 @@ blip.loop = function() {
   loop.tempo = function(bpm) {
     if (!arguments.length) return tempo;
     tempo = bpm;
+    tickInterval = 60 / tempo;
+    return loop;
+  };
+  loop.tickInterval = function(s) {
+    if (!arguments.length) return tickInterval;
+    tickInterval = s;
+    tempo = 60 / tickInterval;
     return loop;
   };
   loop.data = function(a) {
