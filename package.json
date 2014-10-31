@@ -1,6 +1,6 @@
 {
   "name": "blip",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Sweet, sugary goodness for looping and sampling with the Web Audio API",
   "main": "blip.js",
   "scripts": {

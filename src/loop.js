@@ -13,12 +13,15 @@ blip.loop = function() {
 
   var tempo; // ticks per minute
 
+  var tickInterval; // seconds per tick
+
   var data = [];
 
   var currentTick = 0,
       nextTickTime = 0;
 
   var tick = function(t, d, i) {};
+  var each = function(t, i) {};
 
   var iterations = 0,
       limit = 0;
@@ -28,8 +31,7 @@ blip.loop = function() {
   function loop() {}
 
   function nextTick() {
-    var secondsPerTick = 60 / tempo;
-    nextTickTime += secondsPerTick;
+    nextTickTime += tickInterval;
 
     // cycle through ticks
     if (++currentTick >= data.length) {
@@ -43,9 +45,16 @@ blip.loop = function() {
     tick.call(loop, time, data[tickNum], tickNum);
   }
 
+  function scheduleIteration(iterationNum, time) {
+    each.call(loop, time, iterationNum);
+  }
+
   function scheduler() {
     while (nextTickTime < ctx.currentTime + scheduleAheadTime) {
       scheduleTick(currentTick, nextTickTime);
+      if (currentTick === 0) {
+        scheduleIteration(iterations, nextTickTime);
+      }
       nextTick();
       if (limit && iterations >= limit) {
         loop.reset();
@@ -58,6 +67,13 @@ blip.loop = function() {
   loop.tempo = function(bpm) {
     if (!arguments.length) return tempo;
     tempo = bpm;
+    tickInterval = 60 / tempo;
+    return loop;
+  };
+  loop.tickInterval = function(s) {
+    if (!arguments.length) return tickInterval;
+    tickInterval = s;
+    tempo = 60 / tickInterval;
     return loop;
   };
   loop.data = function(a) {
@@ -85,6 +101,11 @@ blip.loop = function() {
     tick = f;
     return loop;
   };
+  loop.each = function(f) {
+    if (!arguments.length) return each;
+    each = f;
+    return loop;
+  }
   loop.start = function(t) {
     nextTickTime = t || ctx.currentTime;
     scheduler();
