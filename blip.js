@@ -489,11 +489,6 @@ blip.clip = function() {
     sample = loadedSamples[name];
     return clip;
   };
-  clip.defaultRate = function(number) {
-    if (!arguments.length) return defaultRate;
-    defaultRate = number;
-    return clip;
-  };
   clip.rate = function(number) {
     if (!arguments.length) return rate;
     rate = number;
@@ -525,6 +520,8 @@ blip.clip = function() {
             this.setValueAtTime(params.gain, time)
           })
         }
+      } else {
+        output_gain.param('gain', params.gain);
       }
       if (typeof params.rate !== 'undefined') {
         if (typeof params.rate === 'function') {
@@ -532,7 +529,12 @@ blip.clip = function() {
         } else {
           source.playbackRate.setValueAtTime(params.rate, time)
         }
+      } else {
+        BlipNode.prototype.param.call(specialBlipNode(source), 'playbackRate', rate);
       }
+    } else {
+      if (gain !== 1) output_gain.param('gain', gain);
+      if (rate !== 1) BlipNode.prototype.param.call(specialBlipNode(source), 'playbackRate', rate);
     }
 
     source.connect(output_gain.node());
