@@ -1,6 +1,8 @@
 (function() {
 
 var blip = {};
+
+blip.version = '0.2.0';
 var ctx = new AudioContext();
 
 
