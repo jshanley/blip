@@ -1,7 +1,7 @@
 {
   "name": "blip",
   "main": "blip.js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://github.com/jshanley/blip",
   "authors": [
     "John Shanley <john.michael.shanley@gmail.com>"
