@@ -2,7 +2,7 @@
 
 var blip = {};
 
-blip.version = '0.2.0';
+blip.version = '0.2.1';
 /* Copyright 2013 Chris Wilson
 
    Licensed under the Apache License, Version 2.0 (the "License");
