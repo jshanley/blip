@@ -3,7 +3,11 @@
 var blip = {};
 
 blip.version = '0.2.1';
-/* Copyright 2013 Chris Wilson
+
+/* AudioContext-MonkeyPatch
+   https://github.com/cwilso/AudioContext-MonkeyPatch
+
+   Copyright 2013 Chris Wilson
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -111,6 +115,8 @@ blip.version = '0.2.1';
     }
   }
 }(window));
+
+/* END AudioContext-MonkeyPatch */
 var ctx = new AudioContext();
 
 
