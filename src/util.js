@@ -12,3 +12,8 @@ function guid() {
     }
     return _p8() + _p8(true) + _p8(true) + _p8();
 }
+
+// MIDI to Frequency
+blip.mtof = function(midi) {
+  return Math.pow(2, (midi - 69) / 12) * 440;
+};
