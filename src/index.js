@@ -20,4 +20,6 @@ import "loop";
 import "sample-loader";
 import "clip";
 
+import "envelope";
+
 import "outro";
