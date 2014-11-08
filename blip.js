@@ -2,7 +2,7 @@
 
 var blip = {};
 
-blip.version = '0.2.1';
+blip.version = '0.3.0';
 
 /* AudioContext-MonkeyPatch
    https://github.com/cwilso/AudioContext-MonkeyPatch
