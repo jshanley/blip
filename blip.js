@@ -2,7 +2,7 @@
 
 var blip = {};
 
-blip.version = '0.3.0';
+blip.version = '0.3.1';
 
 /* AudioContext-MonkeyPatch
    https://github.com/cwilso/AudioContext-MonkeyPatch
@@ -243,84 +243,87 @@ function BlipNode() {
   return this;
 };
 
-BlipNode.prototype = {
+BlipNode.prototype.connect = function(blipnode) {
+  if (this.node().numberOfOutputs > 0 && blipnode.node().numberOfInputs > 0) {
+    this.node().connect(blipnode.node());
+    this.outputs.add(blipnode);
+    blipnode.inputs.add(this);
+  }
+  return this;
+};
 
-  connect: function(blipnode) {
-    if (this.node().numberOfOutputs > 0 && blipnode.node().numberOfInputs > 0) {
-      this.node().connect(blipnode.node());
-      this.outputs.add(blipnode);
-      blipnode.inputs.add(this);
-    }
-    return this;
-  },
+BlipNode.prototype.disconnect = function(blipnode) {
+  // disconnect all
+  this.node().disconnect();
 
-  disconnect: function(blipnode) {
-    // disconnect all
-    this.node().disconnect();
+  var me = this;
 
-    var me = this;
+  if (blipnode) {
+    this.outputs.remove(blipnode);
+    blipnode.inputs.remove(this);
 
-    if (blipnode) {
-      this.outputs.remove(blipnode);
-      blipnode.inputs.remove(this);
-
-      // reconnect to remaining outputs
-      this.outputs.each(function(n) { this.connect(n); })
-    } else {
-      this.outputs.each(function(n) {
-        n.inputs.remove(me);
-      });
-      this.outputs.removeAll();
-    }
-
-    return this;
-  },
-
-  prop: function(name, value) {
-    if (arguments.length < 2) {
-      if (typeof name === 'object') {
-        for (var p in name) {
-          this.node()[p] = name[p];
-        }
-        return this;
-      } else {
-        return this.node()[name];
-      }
-    }
-    this.node()[name] = value;
-    return this;
-  },
-
-  param: function(name, f) {
-    if (arguments.length < 2) return this.node()[name];
-    if (typeof f !== 'function') {
-      this.node()[name].value = f;
-    } else {
-      f.call(this.node()[name]);
-    }
-    return this;
-  },
-
-  start: function(t) {
-    this.node().start.call(this.node(), t);
-  },
-
-  stop: function(t) {
-    this.node().stop.call(this.node(), t);
-  },
-
-  node: function() {
-    return this.node();
-  },
-
-  toString: function() {
-    return '[object BlipNode]';
-  },
-
-  valueOf: function() {
-    return this.id();
+    // reconnect to remaining outputs
+    this.outputs.each(function(n) { this.connect(n); })
+  } else {
+    this.outputs.each(function(n) {
+      n.inputs.remove(me);
+    });
+    this.outputs.removeAll();
   }
 
+  return this;
+}
+
+BlipNode.prototype.prop = function(name, value) {
+  if (arguments.length < 2) {
+    if (typeof name === 'object') {
+      for (var p in name) {
+        this.node()[p] = name[p];
+      }
+      return this;
+    } else {
+      return this.node()[name];
+    }
+  }
+  this.node()[name] = value;
+  return this;
+};
+
+BlipNode.prototype.param = function(name, f) {
+  if (arguments.length < 2) return this.node()[name];
+  if (typeof f !== 'function') {
+    this.node()[name].value = f;
+  } else {
+    f.call(this.node()[name]);
+  }
+  return this;
+};
+
+BlipNode.prototype.start = function(t) {
+  this.node().start.call(this.node(), t);
+};
+
+BlipNode.prototype.stop = function(t) {
+  this.node().stop.call(this.node(), t);
+};
+
+BlipNode.prototype.node = function() {
+  return this.node();
+};
+
+BlipNode.prototype.toString = function() {
+  return '[object BlipNode]';
+};
+
+BlipNode.prototype.valueOf = function() {
+  return this.id();
+};
+
+BlipNode.prototype.call = function(methodName) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  var node = this.node();
+  if (typeof node[methodName] !== 'function') return;
+  node[methodName].apply(node, args);
 };
 
 blip.node = function(type) {

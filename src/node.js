@@ -25,7 +25,7 @@ function BlipNode() {
   return this;
 };
 
-BlipNode.prototype.connect: function(blipnode) {
+BlipNode.prototype.connect = function(blipnode) {
   if (this.node().numberOfOutputs > 0 && blipnode.node().numberOfInputs > 0) {
     this.node().connect(blipnode.node());
     this.outputs.add(blipnode);
@@ -34,7 +34,7 @@ BlipNode.prototype.connect: function(blipnode) {
   return this;
 };
 
-BlipNode.prototype.disconnect: function(blipnode) {
+BlipNode.prototype.disconnect = function(blipnode) {
   // disconnect all
   this.node().disconnect();
 
@@ -56,7 +56,7 @@ BlipNode.prototype.disconnect: function(blipnode) {
   return this;
 }
 
-BlipNode.prototype.prop: function(name, value) {
+BlipNode.prototype.prop = function(name, value) {
   if (arguments.length < 2) {
     if (typeof name === 'object') {
       for (var p in name) {
