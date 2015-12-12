@@ -1,4 +1,5 @@
 .DS_Store
 node_modules/
+jspm_packages/
 wav/
 index.html

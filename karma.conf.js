@@ -15,8 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      './blip.js',
-      './blip.min.js',
+      'dist/blip.js',
       'test/**/*.js'
     ],
 
