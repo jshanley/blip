@@ -1,1 +1,0 @@
-var ctx = new AudioContext();
