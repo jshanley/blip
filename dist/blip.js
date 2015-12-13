@@ -1605,9 +1605,6 @@ $__System.register('12', ['1b'], function (_export) {
     execute: function () {
       ctx = new AudioContext();
 
-      // debug: is this a singleton?
-      console.log('AudioContext created');
-
       _export('default', ctx);
     }
   };
