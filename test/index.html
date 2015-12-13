@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>test</title>
+  <script src="../dist/blip.js"></script>
+</head>
+<body>
+
+<script>
+
+var osc = blip.node('oscillator')
+  .param('frequency', 220)
+  .prop('type', 'triangle')
+  .call('start');
+
+var adsr = blip.envelope()
+  .attack(blip.time.ms(5))
+  .decay(blip.time.ms(100))
+  .sustain(0.2)
+  .release(blip.time.ms(50));
+
+var pan = blip.node('panner')
+  .prop({
+    panningModel: 'HRTF',
+    distanceModel: 'inverse',
+    refDistance: 1,
+    maxDistance: 10000,
+    rolloffFactor: 1,
+    coneInnerAngle: 60,
+    coneOuterAngle: 60,
+    coneOuterGain: 0.2,
+  })
+  .call('setOrientation', 1, 1, 0);
+
+blip.listener
+  .prop({
+    dopplerFactor: 1,
+    speedOfSound: 343.3
+  })
+  .call('setOrientation', 0,0,-1,0,1,0);
+
+blip.chain([osc, adsr, pan, blip.destination]);
+
+var loop = blip.loop()
+  .tempo(130)
+  .data([1,0])
+  .tick(function(t,d,i) {
+    adsr.noteOn(t);
+    adsr.noteOff(t + blip.time.ms(105));
+  })
+  .start();
+
+requestAnimationFrame(panning);
+function panning(t) {
+  pan.call('setVelocity', 0, 0, 100);
+  requestAnimationFrame(panning);
+  console.log(t);
+}
+
+
+</script>
+</body>
+</html>
