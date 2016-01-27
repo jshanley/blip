@@ -5,10 +5,32 @@
     <title>Blip Example</title>
   </head>
   <body>
-    <script src="/system.js"></script>
+    <script src="/jspm_packages/system.js"></script>
     <script src="/config.js"></script>
     <script>
-      System.import('util/browser-bundle');
+      System.import('util/browser-bundle').then(function() {
+
+        blip.loadSamples({
+          'uke': 'https://cdn.rawgit.com/jshanley/blip/1a510ce42fb7c0894b5b8ea973ce953467b8ba64/sounds/ukeC.wav'
+        }).then(function() {
+
+          var uke = blip.clip()
+            .sample('uke')
+            .gain(0.5)
+            .rate(0.5);
+
+          var loop = blip.loop()
+            .tempo(110)
+            .tick(function(t) {
+              uke.play(t, function(source) {
+                source.playbackRate.value = blip.random(0.2, 1.4)
+              })
+            })
+
+          loop.start(blip.time.now())
+          
+        })
+      })
     </script>
   </body>
 </html>
