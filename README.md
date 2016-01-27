@@ -10,44 +10,46 @@
 
 ### Loading Samples
 
-*Blip helps you load samples asynchronously, and gives you a simple callback mechanism to ensure that your samples are ready to use.*
+*The `loadSamples` method takes a map of names to URLs, and returns a promise that resolves once all samples have been downloaded and turned into AudioBuffers*
 
 ``` javascript
-blip.sampleLoader()
-  .samples({
-    'kick', 'path/to/your/kick_sound.wav',
-    'snare', 'path/to/your/snare_sound.wav',
-    'kazoo', 'path/to/your/kazoo_sound.wav'
-  })
-  .done(callback)
-  .load();
+blip.loadSamples({
+  'kick': 'path/to/your/kick_sound.wav',
+  'snare': 'path/to/your/snare_sound.wav',
+  'kazoo': 'path/to/your/kazoo_sound.wav'
+}).then(loaded)
 
-function callback() {
+function loaded() {
   // now your samples are available
-  blip.sample('snare') // is an AudioBuffer
+  blip.sampleLibrary.get('snare') // is an AudioBuffer
 }
 ```
+
+While the sample library gives you direct access to the AudioBuffer, the easiest way to use your loaded samples is to create clips.
 
 ### Creating Clips
 
 *A clip is a wrapper for a sample, which handles creating and wiring up a BufferSource each time the sound is played.*
 
+Create a clip by calling `blip.clip()`
+
+Then you can assign it one of your loaded samples by calling `sample`
+
 ``` javascript
-var bassDrum = blip.clip()
-  .sample('bassDrum');
+var kick = blip.clip().sample('kick');
 
 // play the clip immediately
-bassDrum.play(0);
+kick.play(0);
 
 // play the clip again in 5 seconds
-bassDrum.play(5);
+kick.play(5);
 ```
 
 ## Looping
 
 Blip enables you to create precise loops for playing samples, controlling audio parameters, or just about anything else you can think of by letting you deal directly with time, and providing a simple and elegant scheduling mechanism.
 
-A loop simply provides markers for points in time, to which you can assign arbitrary data, and fire playback events. 
+A loop simply provides markers for points in time, to which you can assign arbitrary data, and fire playback events.
 
 These examples assume the variable `clip` is a blip clip.
 
@@ -90,7 +92,9 @@ var melodic = blip.loop()
   .tempo(120)
   .data([0.3,0.4,0.5,0.6])
   .tick(function(t,d) {
-    clip.play(t, { 'rate': d });
+    clip.play(t, function(source) {
+      source.playbackRate.value = d;
+    });
   })
 
 melodic.start();
@@ -105,13 +109,13 @@ This loop has a 1/3 chance to play a clip on each tick, and assigns it a random 
 ``` javascript
 var entropic = blip.loop()
   .tempo(110)
-  .tick(function(t,d) {
-    if (blip.chance(1/3)) clip.play(t, { 'rate': blip.random(0.2, 1.4) });
+  .tick(function(t) {
+    if (blip.chance(1/3)) clip.play(t, function(source) {
+      source.playbackRate.value = blip.random(0.2, 1.4);
+    })
   })
 
 entropic.start();
 ```
 
 Visit the [**site**](http://jshanley.github.io/blip/) for more examples.
-
-
