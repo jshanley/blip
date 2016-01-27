@@ -49,7 +49,7 @@ kick.play(5);
 
 Blip enables you to create precise loops for playing samples, controlling audio parameters, or just about anything else you can think of by letting you deal directly with time, and providing a simple and elegant scheduling mechanism.
 
-A loop simply provides markers for points in time, to which you can assign arbitrary data, and fire playback events.
+A loop simply provides markers for points in time, to which you can bind arbitrary data, and schedule audio playback.
 
 These examples assume the variable `clip` is a blip clip.
 
