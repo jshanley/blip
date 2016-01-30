@@ -2,7 +2,6 @@
 
 (["1"], [], function($__System) {
 
-!function(e){function n(e,n){for(var t=e.split(".");t.length;)n=n[t.shift()];return n}function t(n){if(Object.keys)Object.keys(e).forEach(n);else for(var t in e)f.call(e,t)&&n(t)}function r(n){t(function(t){if(-1==a.call(l,t)){try{var r=e[t]}catch(o){l.push(t)}n(t,r)}})}var o,i=$__System,f=Object.prototype.hasOwnProperty,a=Array.prototype.indexOf||function(e){for(var n=0,t=this.length;t>n;n++)if(this[n]===e)return n;return-1},l=["_g","sessionStorage","localStorage","clipboardData","frames","frameElement","external","mozAnimationStartTime","webkitStorageInfo","webkitIndexedDB"];i.set("@@global-helpers",i.newModule({prepareGlobal:function(t,i,f){var a=e.define;e.define=void 0,e.exports=void 0,e.module&&e.module.exports&&(e.module=void 0);var l;if(f){l={};for(var u in f)l[u]=e[u],e[u]=f[u]}return i||(o={},r(function(e,n){o[e]=n})),function(){var t;if(i)t=n(i,e);else{var f,u,s={};r(function(e,n){o[e]!==n&&"undefined"!=typeof n&&(s[e]=n,"undefined"!=typeof f?u||f===n||(u=!0):f=n)}),t=u?s:f}if(l)for(var c in l)e[c]=l[c];return e.define=a,t}}}))}("undefined"!=typeof self?self:global);
 !function(){var t=$__System;if("undefined"!=typeof window&&"undefined"!=typeof document&&window.location)var s=location.protocol+"//"+location.hostname+(location.port?":"+location.port:"");t.set("@@cjs-helpers",t.newModule({getPathVars:function(t){var n,o=t.lastIndexOf("!");n=-1!=o?t.substr(0,o):t;var e=n.split("/");return e.pop(),e=e.join("/"),"file:///"==n.substr(0,8)?(n=n.substr(7),e=e.substr(7),isWindows&&(n=n.substr(1),e=e.substr(1))):s&&n.substr(0,s.length)===s&&(n=n.substr(s.length),e=e.substr(s.length)),{filename:n,dirname:e}}}))}();
 $__System.register('2', ['3', '4'], function (_export) {
   'use strict';
@@ -2339,106 +2338,16 @@ $__System.register('4d', ['3', '6', '47', '4c'], function (_export) {
   };
 });
 
-$__System.registerDynamic("4e", [], false, function(__require, __exports, __module) {
-  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
-  (function() {
-    (function(global, exports, perf) {
-      'use strict';
-      function fixSetTarget(param) {
-        if (!param)
-          return;
-        if (!param.setTargetAtTime)
-          param.setTargetAtTime = param.setTargetValueAtTime;
-      }
-      if (window.hasOwnProperty('webkitAudioContext') && !window.hasOwnProperty('AudioContext')) {
-        window.AudioContext = webkitAudioContext;
-        if (!AudioContext.prototype.hasOwnProperty('createGain'))
-          AudioContext.prototype.createGain = AudioContext.prototype.createGainNode;
-        if (!AudioContext.prototype.hasOwnProperty('createDelay'))
-          AudioContext.prototype.createDelay = AudioContext.prototype.createDelayNode;
-        if (!AudioContext.prototype.hasOwnProperty('createScriptProcessor'))
-          AudioContext.prototype.createScriptProcessor = AudioContext.prototype.createJavaScriptNode;
-        if (!AudioContext.prototype.hasOwnProperty('createPeriodicWave'))
-          AudioContext.prototype.createPeriodicWave = AudioContext.prototype.createWaveTable;
-        AudioContext.prototype.internal_createGain = AudioContext.prototype.createGain;
-        AudioContext.prototype.createGain = function() {
-          var node = this.internal_createGain();
-          fixSetTarget(node.gain);
-          return node;
-        };
-        AudioContext.prototype.internal_createDelay = AudioContext.prototype.createDelay;
-        AudioContext.prototype.createDelay = function(maxDelayTime) {
-          var node = maxDelayTime ? this.internal_createDelay(maxDelayTime) : this.internal_createDelay();
-          fixSetTarget(node.delayTime);
-          return node;
-        };
-        AudioContext.prototype.internal_createBufferSource = AudioContext.prototype.createBufferSource;
-        AudioContext.prototype.createBufferSource = function() {
-          var node = this.internal_createBufferSource();
-          if (!node.start) {
-            node.start = function(when, offset, duration) {
-              if (offset || duration)
-                this.noteGrainOn(when, offset, duration);
-              else
-                this.noteOn(when);
-            };
-          }
-          if (!node.stop)
-            node.stop = node.noteOff;
-          fixSetTarget(node.playbackRate);
-          return node;
-        };
-        AudioContext.prototype.internal_createDynamicsCompressor = AudioContext.prototype.createDynamicsCompressor;
-        AudioContext.prototype.createDynamicsCompressor = function() {
-          var node = this.internal_createDynamicsCompressor();
-          fixSetTarget(node.threshold);
-          fixSetTarget(node.knee);
-          fixSetTarget(node.ratio);
-          fixSetTarget(node.reduction);
-          fixSetTarget(node.attack);
-          fixSetTarget(node.release);
-          return node;
-        };
-        AudioContext.prototype.internal_createBiquadFilter = AudioContext.prototype.createBiquadFilter;
-        AudioContext.prototype.createBiquadFilter = function() {
-          var node = this.internal_createBiquadFilter();
-          fixSetTarget(node.frequency);
-          fixSetTarget(node.detune);
-          fixSetTarget(node.Q);
-          fixSetTarget(node.gain);
-          return node;
-        };
-        if (AudioContext.prototype.hasOwnProperty('createOscillator')) {
-          AudioContext.prototype.internal_createOscillator = AudioContext.prototype.createOscillator;
-          AudioContext.prototype.createOscillator = function() {
-            var node = this.internal_createOscillator();
-            if (!node.start)
-              node.start = node.noteOn;
-            if (!node.stop)
-              node.stop = node.noteOff;
-            if (!node.setPeriodicWave)
-              node.setPeriodicWave = node.setWaveTable;
-            fixSetTarget(node.frequency);
-            fixSetTarget(node.detune);
-            return node;
-          };
-        }
-      }
-    }(window));
-  })();
-  return _retrieveGlobal();
-});
-
-$__System.register('3', ['4e'], function (_export) {
-  'use strict';
+$__System.register("3", [], function (_export) {
+  "use strict";
 
   var ctx;
   return {
-    setters: [function (_e) {}],
+    setters: [],
     execute: function () {
       ctx = new AudioContext();
 
-      _export('default', ctx);
+      _export("default", ctx);
     }
   };
 });
@@ -2482,7 +2391,7 @@ $__System.register('c', ['3'], function (_export) {
   };
 });
 
-$__System.register("4f", [], function (_export) {
+$__System.register("4e", [], function (_export) {
   "use strict";
 
   var random;
@@ -2505,7 +2414,7 @@ $__System.register("4f", [], function (_export) {
   };
 });
 
-$__System.register("50", [], function (_export) {
+$__System.register("4f", [], function (_export) {
   "use strict";
 
   var chance;
@@ -2522,12 +2431,12 @@ $__System.register("50", [], function (_export) {
   };
 });
 
-$__System.register('51', ['2', '3', '4', '5', '6', '7', '8', '50', 'b', '4d', 'c', '4f'], function (_export) {
+$__System.register('50', ['2', '3', '4', '5', '6', '7', '8', 'b', '4d', 'c', '4e', '4f'], function (_export) {
 
   // public api
   'use strict';
 
-  var destination, ctx, BlipNode, clipFactory, sampleLibrary, chainFactory, loopFactory, chance, envelopeFactory, loadSamples, time, random, blip;
+  var destination, ctx, BlipNode, clipFactory, sampleLibrary, chainFactory, loopFactory, envelopeFactory, loadSamples, time, random, chance, blip;
   return {
     setters: [function (_2) {
       destination = _2['default'];
@@ -2543,16 +2452,16 @@ $__System.register('51', ['2', '3', '4', '5', '6', '7', '8', '50', 'b', '4d', 'c
       chainFactory = _5['default'];
     }, function (_6) {
       loopFactory = _6['default'];
-    }, function (_8) {
-      chance = _8['default'];
     }, function (_b) {
       envelopeFactory = _b['default'];
     }, function (_d) {
       loadSamples = _d['default'];
     }, function (_c) {
       time = _c['default'];
+    }, function (_e) {
+      random = _e['default'];
     }, function (_f) {
-      random = _f['default'];
+      chance = _f['default'];
     }],
     execute: function () {
       blip = {};
@@ -2586,7 +2495,7 @@ $__System.register('51', ['2', '3', '4', '5', '6', '7', '8', '50', 'b', '4d', 'c
   };
 });
 
-$__System.register('1', ['51'], function (_export) {
+$__System.register('1', ['50'], function (_export) {
   'use strict';
 
   var blip;
