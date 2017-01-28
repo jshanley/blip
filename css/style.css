@@ -1,16 +1,37 @@
-html, body {
-  background-color: #333;
+body {
+  margin: 0;
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 100%;
+  color: #222526;
+}
+
+.leader {
+  max-width: 100%;
+  padding: 5rem 1rem 2rem;
+  background-color: #222526;
   color: #D3E8F2;
+  letter-spacing: 1px;
+  font-weight: 200;
+}
+.leader-inner {
+  max-width: 800px;
+  margin: auto;
+}
+h1 {
+  margin: 0;
+  font-family: 'Fjalla One', sans-serif;
+  font-size: 68px;
+}
+
+section {
+  margin: auto;
+  padding: 0 1rem;
+  max-width: 800px;
 }
 
 p {
-  font-size: 1.1em;
-}
-
-.project-header {
-  margin-top: 60px;
-  margin-bottom: 30px;
-  font-family: 'Fjalla One', sans-serif;
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 1rem;
 }
 
 .logo {
@@ -18,27 +39,18 @@ p {
   margin-top: 10px;
 }
 
-.vcenter {
-  display: inline-block;
-  vertical-align: middle;
-  float: none;
-}
-
-.examples {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
 .example-fiddle {
   margin-left: 10px;
 }
 
 h2 {
-  margin-top: 50px;
+  font-size: 30px;
+  font-weight: 200;
 }
-
 h3 {
-  margin-top: 50px;
+  font-weight: bold;
+  font-size: 18px;
+  text-transform: uppercase;
 }
 
 .created-by {
@@ -55,6 +67,37 @@ ul li {
 }
 
 ul li::before {
-  content: '↳';
+  content: '→';
   margin: 1em;
+}
+
+a {
+  color: crimson;
+}
+a:hover,
+a:active {
+
+}
+a:visited {
+  color: crimson;
+}
+
+
+pre {
+  margin: 0;
+  margin-left: -1rem;
+  margin-right: -1rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+}
+code {
+  margin: 0;
+  font-family: 'Fira Mono', monospace;
+  font-size: 14px;
+}
+
+footer {
+  text-align: center;
 }

@@ -6,29 +6,167 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Blip.</title>
 
-    <!-- Google Fonts -->
-    <link href="http://fonts.googleapis.com/css?family=Fjalla+One" rel="stylesheet" type="text/css" />
-
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
-
-    <!-- Syntax Highligher-->
-    <link href="css/shCore.css" rel="stylesheet" type="text/css" />
-    <link href="css/shThemeDefault.css" rel="stylesheet" type="text/css" />
-    <link href="css/shThemeBlip.css" rel="stylesheet" type="text/css" />
-
-    <!-- Custom css -->
+    <link href="https://fonts.googleapis.com/css?family=Fjalla+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:200,400,700" rel="stylesheet">
+    <link href="css/hljs-atom-one-dark.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet" />
 
-    <!-- Favicon -->
     <link rel="shortcut icon" type="image/ico" href="img/favicon.ico" />
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+  </head>
+  <body>
+    <div class="leader">
+      <div class="leader-inner">
+        <header>
+          <h1>Blip. <img src="img/blip.png" class="logo"></h1>
+        </header>
+        <p>A lightweight JavaScript library that wraps the Web Audio API, abstracting away the AudioContext, and simplifying node creation and audio routing. It provides some extremely powerful and flexible methods for looping and manipulating samples that allow for both temporal precision and musical expressiveness.</p>
+      </div>
+    </div>
+    <section>
+      <h2>Download / Install</h2>
+      <ul>
+        <li>Download <a href="https://cdn.rawgit.com/jshanley/blip/master/blip.js">blip.js</a> or <a href="https://cdn.rawgit.com/jshanley/blip/master/blip.min.js">blip.min.js</a></li>
+        <li>Using bower: <code>$ bower install blip</code></li>
+      </ul>
+    </section>
+    <section>
+      <header>
+        <h2>Getting Started</h2>
+      </header>
+      <header>
+        <h3>Loading in Samples</h3>
+      </header>
+      <p>Blip helps you load samples asynchronously, and gives you a simple callback mechanism to ensure that your samples are ready to use.</p>
+      <pre>
+        <code class="javascript">
+          blip.sampleLoader()
+            .samples({
+              'kick', 'path/to/your/kick_sound.wav',
+              'snare', 'path/to/your/snare_sound.wav',
+              'kazoo', 'path/to/your/kazoo_sound.wav'
+            })
+            .done(callback)
+            .load();
+
+          function callback() {
+            // now your samples are available
+            blip.sample('snare') // is an AudioBuffer
+          }
+        </code>
+      </pre>
+    </section>
+    <section>
+      <header>
+        <h3>Creating Clips</h3>
+      </header>
+      <p>A clip is a wrapper for a sample, which handles creating and wiring up a BufferSource each time the sound is played.</p>
+      <pre>
+        <code class="javascript">
+          var kick = blip.clip()
+
+          // assign an audio sample
+          kick.sample('kick');
+
+          // play the clip immediately
+          kick.play(0);
+
+          // play the clip again in 5 seconds
+          kick.play(5);
+        </code>
+      </pre>
+      <a href="http://jsfiddle.net/q8jt8o36/4/" target="_blank">JSFiddle</a>
+    </section>
+    <section>
+      <header>
+        <h2>Looping</h2>
+      </header>
+      <p>Blip enables you to create precise loops for playing samples, controlling audio parameters, or just about anything else you can think of by letting you deal directly with time, and providing a simple and elegant scheduling mechanism.</p>
+      <p>A loop simply provides markers for points in time, to which you can assign arbitrary data, and fire playback events.</p>
+      <p>These examples assume the variable clip is a blip clip.</p>
+    </section>
+    <section>
+      <header>
+        <h3>Basic Looping</h3>
+      </header>
+      <p>A loop generates "ticks" at a specific tempo, and allows you to schedule events based on the time of each tick.</p>
+      <pre>
+        <code class="javascript">
+          var monotonous = blip.loop()
+            .tempo(110)
+            .tick(function(t) {
+              clip.play(t)
+            });
+
+          monotonous.start();
+        </code>
+      </pre>
+      <a href="http://jsfiddle.net/q8jt8o36/6/" target="_blank">JSFiddle</a>
+    </section>
+    <section>
+      <header>
+        <h3>Better Looping</h3>
+      </header>
+      <p>Loops can take an array of arbitrary data to loop over, and the current datum is passed as the second argument to the tick callback.</p>
+      <pre>
+        <code class="javascript">
+          var rhythmic = blip.loop()
+            .tempo(130)
+            .data([1,0,1,1,0])
+            .tick(function(t,d) {
+              if (d) {
+                clip.play(t)
+              }
+            });
+
+          rhythmic.start();
+        </code>
+      </pre>
+      <a href="http://jsfiddle.net/q8jt8o36/9/" target="_blank">JSFiddle</a>
+    </section>
+    <section>
+      <header>
+        <h3>Awesome Looping</h3>
+      </header>
+      <p>The data passed in can represent anything you want it to. In this case it is being used to set the playback rate of the clip.</p>
+      <pre>
+        <code class="javascript">
+          var melodic = blip.loop()
+            .tempo(120)
+            .data([0.3,0.4,0.5,0.6])
+            .tick(function(t,d) {
+              clip.play(t, { 'rate': d });
+            })
+
+          melodic.start();
+        </code>
+      </pre>
+      <a href="http://jsfiddle.net/q8jt8o36/10/" target="_blank">JSFiddle</a>
+    </section>
+    <section>
+      <header>
+        <h3>Add some randomness</h3>
+      </header>
+      <p>Blip provides helper functions to add elements of randomness and chance to your compositions.</p>
+      <p>This loop has a 1/3 chance to play a clip on each tick, and assigns it a random rate between 0.2 and 1.4</p>
+      <pre>
+        <code class="javascript">
+          var entropic = blip.loop()
+            .tempo(110)
+            .tick(function(t,d) {
+              if (blip.chance(1/3)) clip.play(t, { 'rate': blip.random(0.2, 1.4) });
+            })
+
+          entropic.start();
+        </code>
+      </pre>
+      <a href="http://jsfiddle.net/q8jt8o36/11/" target="_blank">JSFiddle</a>
+    </section>
+
+    <footer>
+      <p class="created-by">Created by <a href="https://twitter.com/jmshanley">John Shanley</a></p>
+    </footer>
+
 
     <!-- GA -->
     <script>
@@ -39,190 +177,11 @@
       ga('create', 'UA-56153932-1', 'auto');
       ga('send', 'pageview');
     </script>
-  </head>
-  <body>
-    <!-- Fork me on Github -->
+
+    <script src="js/highlight.pack.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- Fork me on GitHub -->
     <a href="https://github.com/jshanley/blip"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
-    <!-- container -->
-    <div class="container" ng-controller="BlipCtrl">
-      <div class="row project-header">
-        <div class="col-md-1 col-md-offset-2 vcenter">
-          <h1 class="header-item">Blip.</h1>
-        </div>
-        <div class="col-md-1 vcenter">
-          <div><img src="img/blip.png" class="logo"></div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-          <p>blip is a lightweight JavaScript library that wraps the Web Audio API, abstracting away the AudioContext, and simplifying node creation and audio routing. It also provides some extremely powerful and flexible methods for looping and manipulating samples that allow for both temporal precision and musical expressiveness.</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-          <h2>Examples</h2>
-        </div>
-        <div class="col-md-8 col-md-offset-2 examples">
-          <button type="button" class="btn btn-default btn-sm play-button" id="example1-play">
-            <span class="glyphicon glyphicon-play"></span> ambient
-          </button>
-          <button type="button" class="btn btn-default btn-sm pause-button" id="example1-pause" style="display: none;">
-            <span class="glyphicon glyphicon-pause"></span> ambient
-          </button>
-          <a href="http://jsfiddle.net/q8jt8o36/1/" class="example-fiddle" target="_blank">Fiddle</a>
-        </div>
-        <div class="col-md-8 col-md-offset-2 examples">
-          <button type="button" class="btn btn-default btn-sm play-button" id="example2-play">
-            <span class="glyphicon glyphicon-play"></span> wandering
-          </button>
-          <button type="button" class="btn btn-default btn-sm pause-button" id="example2-pause" style="display: none;">
-            <span class="glyphicon glyphicon-pause"></span> wandering
-          </button>
-          <a href="http://jsfiddle.net/q8jt8o36/12/" class="example-fiddle" target="_blank">Fiddle</a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-          <h3>View the <a href="http://github.com/jshanley/blip/wiki/API-Documentation">API Docs</a> >></h3>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-          <h2>Download / Install</h2>
-          <ul>
-            <li>Download <a href="https://cdn.rawgit.com/jshanley/blip/master/blip.js">blip.js</a> or <a href="https://cdn.rawgit.com/jshanley/blip/master/blip.min.js">blip.min.js</a></li>
-            <li>bower install blip</li>
-          </ul>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-          <h2>Getting Started</h2>
-          <h3>Loading in Samples</h3>
-          <p>Blip helps you load samples asynchronously, and gives you a simple callback mechanism to ensure that your samples are ready to use.</p>
-          <pre class="brush: js">
-            blip.sampleLoader()
-              .samples({
-                'kick', 'path/to/your/kick_sound.wav',
-                'snare', 'path/to/your/snare_sound.wav',
-                'kazoo', 'path/to/your/kazoo_sound.wav'
-              })
-              .done(callback)
-              .load();
-
-            function callback() {
-              // now your samples are available
-              blip.sample('snare') // is an AudioBuffer
-            }
-          </pre>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-          <h3>Creating Clips</h3>
-          <p>A clip is a wrapper for a sample, which handles creating and wiring up a BufferSource each time the sound is played.</p>
-          <pre class="brush: js;">
-            var bassDrum = blip.clip()
-              .sample('bassDrum');
-
-            // play the clip immediately
-            bassDrum.play(0);
-
-            // play the clip again in 5 seconds
-            bassDrum.play(5);
-          </pre>
-        </div>
-        <div class="col-md-8 col-md-offset-2">
-          <a href="http://jsfiddle.net/q8jt8o36/4/" target="_blank">Fiddle</a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-          <h2>Looping</h2>
-          <p>Blip enables you to create precise loops for playing samples, controlling audio parameters, or just about anything else you can think of by letting you deal directly with time, and providing a simple and elegant scheduling mechanism.</p>
-
-          <p>A loop simply provides markers for points in time, to which you can assign arbitrary data, and fire playback events.</p>
-
-          <p>These examples assume the variable clip is a blip clip.</p>
-          <h3>Basic Looping</h3>
-          <p>A loop generates "ticks" at a specific tempo, and allows you to schedule events based on the time of each tick.</p>
-          <pre class="brush: js;">
-            var monotonous = blip.loop()
-              .tempo(110)
-              .tick(function(t) {
-                clip.play(t)
-              });
-
-            monotonous.start();
-          </pre>
-          <a href="http://jsfiddle.net/q8jt8o36/6/" target="_blank">Fiddle</a>
-          <h3>Better Looping</h3>
-          <p>Loops can take an array of arbitrary data to loop over, and the current datum is passed as the second argument to the tick callback.</p>
-          <pre class="brush: js;">
-            var rhythmic = blip.loop()
-              .tempo(130)
-              .data([1,0,1,1,0])
-              .tick(function(t,d) {
-                if (d) {
-                  clip.play(t)
-                }
-              });
-
-            rhythmic.start();
-          </pre>
-          <a href="http://jsfiddle.net/q8jt8o36/9/" target="_blank">Fiddle</a>
-          <h3>Awesome Looping</h3>
-          <p>The data passed in can represent anything you want it to. In this case it is being used to set the playback rate of the clip.</p>
-          <pre class="brush: js;">
-            var melodic = blip.loop()
-              .tempo(120)
-              .data([0.3,0.4,0.5,0.6])
-              .tick(function(t,d) {
-                clip.play(t, { 'rate': d });
-              })
-
-            melodic.start();
-          </pre>
-          <a href="http://jsfiddle.net/q8jt8o36/10/" target="_blank">Fiddle</a>
-          <h3>Add some randomness</h3>
-          <p>Blip provides helper functions to add elements of randomness and chance to your compositions.</p>
-
-          <p>This loop has a 1/3 chance to play a clip on each tick, and assigns it a random rate between 0.2 and 1.4</p>
-          <pre class="brush: js;">
-            var entropic = blip.loop()
-              .tempo(110)
-              .tick(function(t,d) {
-                if (blip.chance(1/3)) clip.play(t, { 'rate': blip.random(0.2, 1.4) });
-              })
-
-            entropic.start();
-          </pre>
-          <a href="http://jsfiddle.net/q8jt8o36/11/" target="_blank">Fiddle</a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-          <p class="created-by">Created by <a href="https://twitter.com/macseanlaoish">John Shanley</a></p>
-        </div>
-      </div>
-    </div>
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="js/jquery-1.11.1.min.js"></script>
-
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-
-    <!-- blip. -->
-    <script type="text/javascript" src="blip.min.js"></script>
-    <script type="text/javascript" src="js/examples/example1.js"></script>
-    <script type="text/javascript" src="js/examples/example2.js"></script>
-
-    <!-- Syntax Highligher -->
-    <script type="text/javascript" src="js/shCore.js"></script>
-    <script type="text/javascript" src="js/shBrushJScript.js"></script>
-    <script type="text/javascript">
-      SyntaxHighlighter.all()
-    </script>
   </body>
 </html>
