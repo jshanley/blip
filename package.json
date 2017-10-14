@@ -1,5 +1,5 @@
 {
-  "name": "blip",
+  "name": "blip-js",
   "version": "0.5.0",
   "description": "Sweet, sugary goodness for looping and sampling with the Web Audio API",
   "main": "dist/blip.cjs.js",
